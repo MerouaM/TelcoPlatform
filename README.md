@@ -39,3 +39,17 @@ Web3.js v1.10.0
 OAI federated 5GC: https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-nwdaf/-/blob/master/docs/TUTORIAL.md?ref_type=heads
 OAI NWDAF, gnbsim, and UE: https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed
 
+# Deployment
+
+- Deploy the blockchain and cellular network parts.
+- Deploy the smart contracts
+- Edit the codes marketplace.js and performanceLog.js by adding the smart contract address anb ABIs.
+- Update the provision.py script by filling in the path to the fedearted 5GC and NWDAF directories.
+
+# Service launch
+
+- Launch the provision.py script: python provision.py (make sure that the env is activated as indicated in the OAI NWDAF guide)
+- Launch the performanceLog.js: node performanceLog.js
+- Launch the marketplace.js script: node marketplace.js , and interact with the script to create an SLA.
+- Once the SLA is created, the tesbed auto;atically launches the network services, retrieves performance data that it logs in a file and into the blockchain, and stops the service at the expiration of the SLA.
+
