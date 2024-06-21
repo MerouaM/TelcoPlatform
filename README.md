@@ -1,6 +1,7 @@
 # TelcoPlatform
 
-#Project context and description
+
+# Project context and description
 
 A blockchain-based platform for Telcos to provide private networks in the context of beyond-5G/6G
 
@@ -23,3 +24,18 @@ The management layer comprises multiple scripts that interface between users and
 - **performanceLog.js:** This JavaScript script, using the web3.js library, logs observability information received from provision.py to the blockchain via the PerformanceLog.sol SC.
 
 The service layer is set up using a Docker Compose environment to deploy an OAI 5G core, which includes the main 5G core network functions (NFs), the OAI gnbsim to simulate the RAN, and a simulated UE, all as Docker containers. Additionally, the network includes an OAI NWDAF (deployed through multiple Docker containers) for capturing network analytics (e.g., number of connected UEs, PDU sessions).
+
+# Preliminaries
+
+- **The blockchain part** 
+Truffle v5.11.5 (core: 5.11.5)
+Ganache v7.9.1
+Solidity - 0.8.21 (solc-js)
+Node v16.15.1
+Web3.js v1.10.0
+
+
+- **The cellular network part**
+OAI federated 5GC: https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-nwdaf/-/blob/master/docs/TUTORIAL.md?ref_type=heads
+OAI NWDAF, gnbsim, and UE: https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed
+
