@@ -27,17 +27,17 @@ The service layer is set up using a Docker Compose environment to deploy an OAI 
 
 # Preliminaries
 
-- **The blockchain part** 
-Truffle v5.11.5 (core: 5.11.5)
-Ganache v7.9.1
-Solidity - 0.8.21 (solc-js)
-Node v16.15.1
-Web3.js v1.10.0
+**The blockchain part** 
+- Truffle v5.11.5 (core: 5.11.5)
+- Ganache v7.9.1
+- Solidity - 0.8.21 (solc-js)
+- Node v16.15.1
+- Web3.js v1.10.0
 
 
-- **The cellular network part**
-OAI federated 5GC: https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-nwdaf/-/blob/master/docs/TUTORIAL.md?ref_type=heads
-OAI NWDAF, gnbsim, and UE: https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed
+**The cellular network part**
+- OAI federated 5GC: https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-nwdaf/-/blob/master/docs/TUTORIAL.md?ref_type=heads
+- OAI NWDAF, gnbsim, and UE: https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed
 
 # Deployment
 
