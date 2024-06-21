@@ -5,12 +5,16 @@ contract Marketplace {
     // ----------------- client -----------------------
     struct TClient {
         bool exists;
+        string name;
     }
 
     mapping(address => TClient) private clients;
 
+    address[] private clientList;
+    uint256 public clientCount;
+
     // Event to be emitted when a new client is registered
-    event ClientRegisteredEvent(address clientAddress);
+    event ClientRegisteredEvent(address clientAddress, string name);
 
     // Modifier to check if client is not already registered
     modifier isNotClient() {
@@ -25,9 +29,11 @@ contract Marketplace {
     }
 
     // Function to register a new client
-    function registerClient() public isNotClient {
-        clients[msg.sender] = TClient({exists: true});
-        emit ClientRegisteredEvent(msg.sender);
+    function registerClient(string memory name) public isNotClient {
+        clients[msg.sender] = TClient({exists: true, name: name});
+        clientList.push(msg.sender);
+        clientCount++;
+        emit ClientRegisteredEvent(msg.sender, name);
     }
 
     // Function to check if a client has an account
@@ -35,17 +41,26 @@ contract Marketplace {
         return clients[_clientAddress].exists;
     }
 
+    // Function to get all clients
+    function getAllClients() public view returns (address[] memory) {
+        return clientList;
+    }
+
     // ----------------- provider -----------------------
     struct TProvider {
         bool exists;
+        string name;
         uint256 ratingCount;
         uint256 ratingSum;
     }
 
     mapping(address => TProvider) private providers;
+    
+    address[] private providerList;
+    uint256 public providerCount;
 
     // Event to be emitted when a new provider is registered
-    event ProviderRegisteredEvent(address providerAddress);
+    event ProviderRegisteredEvent(address providerAddress, string name);
 
     // Modifier to check if provider is not already registered
     modifier isNotProvider() {
@@ -60,9 +75,11 @@ contract Marketplace {
     }
 
     // Function to register a new provider
-    function registerProvider() public isNotProvider {
-        providers[msg.sender] = TProvider({exists: true, ratingSum: 0, ratingCount: 0});
-        emit ProviderRegisteredEvent(msg.sender);
+    function registerProvider(string memory name) public isNotProvider {
+        providers[msg.sender] = TProvider({exists: true, name: name, ratingSum: 0, ratingCount: 0});
+        providerList.push(msg.sender);
+        providerCount++;
+        emit ProviderRegisteredEvent(msg.sender, name);
     }
 
     // Function to check if a provider has an account
@@ -76,19 +93,27 @@ contract Marketplace {
         return (provider.ratingSum, provider.ratingCount);
     }
 
+    // Function to get all providers
+    function getAllProviders() public view returns (address[] memory) {
+        return providerList;
+    }
+
     // ----------------- component -----------------------
     struct TComponent {
         bool exists;
         string name;
+        uint256 price;
+        string information;
         address provider;
     }
 
     // Mapping from component ID to TComponent
     mapping(uint256 => TComponent) public components;
     uint256 public componentCount;
+    uint256[] private componentList;
 
     // Event to be emitted when a new component is created
-    event NewComponentAddedEvent(uint256 componentId, string name, address provider);
+    event NewComponentAddedEvent(uint256 componentId, string name, uint256 price, string information, address provider);
 
     // Modifier to check if component is not already registered
     modifier isNotComponentExist(uint256 _componentId) {
@@ -103,16 +128,27 @@ contract Marketplace {
     }
 
     // Function to add new component
-    function addComponent(string memory _name) public isProvider {
+    function addComponent(string memory _name, uint256 price, string memory information) public isProvider {
         uint256 newComponentId = componentCount++;
-        components[newComponentId] = TComponent({name: _name, provider: msg.sender, exists: true});
-        emit NewComponentAddedEvent(newComponentId, _name, msg.sender);
+        components[newComponentId] = TComponent({name: _name, provider: msg.sender, price: price, information: information, exists: true});
+        componentList.push(newComponentId);
+        emit NewComponentAddedEvent(newComponentId, _name, price, information, msg.sender);
     }
 
     // Function to get component details
-    function getComponent(uint256 _componentId) public view isComponentExists(_componentId) returns (string memory, address) {
+    function getComponent(uint256 _componentId) public view isComponentExists(_componentId) returns (string memory, uint256, string memory, address) {
         TComponent storage component = components[_componentId];
-        return (component.name, component.provider);
+        return (component.name, component.price, component.information, component.provider);
+    }
+
+    function getComponentPrice(uint256 _componentId) public view isComponentExists(_componentId) returns (uint256) {
+        TComponent storage component = components[_componentId];
+        return (component.price);
+    }
+
+    // Function to get all components
+    function getAllComponents() public view returns (uint256[] memory) {
+        return componentList;
     }
 
     // ----------------- sla contract -----------------------
@@ -129,9 +165,10 @@ contract Marketplace {
     // Mapping from sla contract ID to SLa contract
     mapping(uint256 => TSLAContract) public slaContracts;
     uint256 public contractCount;
+    uint256[] private slaContractList;
 
     // Event to be emitted when a new sla Contract is created
-    event SlaContractsCreatedEvent(uint256 contractId, uint256 componentId, address client, uint256 rentEndTime);
+    event SlaContractsCreatedEvent(uint256 contractId, uint256 componentId, address client, uint256 rentalDuration, uint256 rentEndTime);
 
     // Event to be emitted when an SLA contract is rated
     event SLAContractRatedEvent(uint256 contractId, uint8 rating);
@@ -141,6 +178,10 @@ contract Marketplace {
         require(msg.value > 0, "Rental price must be greater than zero.");
         
         uint256 rentEndTime = block.timestamp + _rentalDuration;
+        uint256 componentPrice = getComponentPrice(_componentId);
+        uint256 rentPrice = componentPrice * (_rentalDuration/60);
+
+        require(msg.value == rentPrice, "Wrong rental price");    
         
         slaContracts[contractCount] = TSLAContract({
             componentId: _componentId,
@@ -152,7 +193,9 @@ contract Marketplace {
             isCompleted: false
         });
 
-        emit SlaContractsCreatedEvent(contractCount, _componentId, msg.sender, rentEndTime);
+        slaContractList.push(contractCount);
+
+        emit SlaContractsCreatedEvent(contractCount, _componentId, msg.sender, _rentalDuration, rentEndTime);
         contractCount++;
     }
 
@@ -184,5 +227,10 @@ contract Marketplace {
             slaContract.rentEndTime,
             slaContract.isCompleted
         );
+    }
+
+    // Function to get all SLA contracts
+    function getAllSLAContracts() public view returns (uint256[] memory) {
+        return slaContractList;
     }
 }
